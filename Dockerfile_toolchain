@@ -1,7 +1,8 @@
 # -----------------------------------
 # ------ NORDIX SDK TOOLCHAIN -------
 # -----------------------------------
-FROM ubuntu:16.04
+
+FROM ubuntu:22.04 as base
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
@@ -11,7 +12,7 @@ RUN apt-get update && apt-get install -y \
     wget \
     zip
 
-# Download and install OpenOCD
+# Download and install Nordic SDK v11
 RUN wget https://developer.nordicsemi.com/nRF5_SDK/nRF5_SDK_v11.x.x/nRF5_SDK_11.0.0_89a8197.zip && \
     unzip nRF5_SDK_11.0.0_89a8197.zip -d /usr/src/nRF5_SDK_11 && \
     rm nRF5_SDK_11.0.0_89a8197.zip
@@ -20,7 +21,7 @@ RUN wget https://developer.nordicsemi.com/nRF5_SDK/nRF5_SDK_v11.x.x/nRF5_SDK_11.
 WORKDIR /usr/src/nRF5_SDK_11
 
 # Toolchain setup
-RUN sed -i "s/\/usr\/local\/gcc-arm-none-eabi-4_9-2015q1/\/usr\//" \
+RUN sed -i "s/\/usr\/local\/gcc-arm-none-eabi-.*/\/usr\//" \
     components/toolchain/gcc/Makefile.posix
 
 CMD tail -f /dev/null

@@ -81,7 +81,22 @@ CFLAGS += -DBOARD_CUSTOM
 CFLAGS += -DBSP_DEFINES_ONLY
 CFLAGS += -mcpu=cortex-m0
 CFLAGS += -mthumb -mabi=aapcs --std=gnu99
-CFLAGS += -Wall -Werror -O3 -g3
+
+# With GCC 4_9-2015q1 (default in Ubuntu 16.04, but quite an old version), it's
+# safe to enable -O3. However, with GCC 10.3.1 (default in Ubuntu 22.04), it
+# causes some weird error where (some) keys are not send properly: e.g. a 'z'
+# now gets send as 'Z'. My educated guess: the matrix data seems to be squashed
+# together (bit-packed) to safe memory space, but does not get unpacked or send
+# properly. I guess this is the cause, because my 'z' key is right next to my
+# left shit key (standard qwerty layout), and other keys get mangled as well
+# (e.g. my 'n' key gets mangled with a layer-change key on the right thumb
+# cluster). I could safely reproduce this on 1 keyboard half, with no other
+# changes than -O2 vs -O3. I did not investigate further, or look for a fix, as
+# this will require a thorough deep dive in GCC and optimization differences
+# between -O2 and -O3, for which I have no motivation, especially because -O3
+# aggresively optimizes for execution speed at the cost of code size, of which
+# the latter is arguably a bit more important on our nRF51 chips...
+CFLAGS += -Wall -Werror -O2 -g3
 CFLAGS += -Wno-unused-function
 CFLAGS += -Wno-unused-variable
 CFLAGS += -mfloat-abi=soft
